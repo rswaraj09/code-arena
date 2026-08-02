@@ -1,7 +1,7 @@
 spring:
   data:
     mongodb:
-      uri: ${MONGODB_URI:mongodb://localhost:27017/codearena_dev}
+      uri: ${MONGODB_URI:mongodb+srv://swarajritik_db_user:m9rbwAbkCCr1kNuh@cluster0.4ykba4o.mongodb.net/code-arena?retryWrites=true&w=majority}
 
 logging:
   level:
