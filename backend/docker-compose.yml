@@ -1,0 +1,53 @@
+version: "3.8"
+
+# Reads a .env file in this same directory automatically (Docker Compose's
+# built-in behavior) — copy .env.example to .env and adjust before running.
+
+services:
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_NAME:-codearena}
+      MYSQL_USER: ${DB_USERNAME:-codearena}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-codearena}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+    ports:
+      - "3306:3306"
+    volumes:
+      - codearena-mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      # Overrides that only make sense inside the Compose network — kept
+      # separate from .env so the same .env also works for `mvn spring-boot:run`
+      # against a locally-installed MySQL on plain localhost.
+      SPRING_PROFILES_ACTIVE: prod
+      DB_HOST: mysql
+      DB_PORT: "3306"
+    ports:
+      - "8080:8080"
+    volumes:
+      # Lets the backend container launch *sibling* Docker containers for
+      # the judge — see docs/docker-sandbox-guide.md §7. This effectively
+      # grants root-equivalent host access, so only ever mount this on a
+      # backend you trust and isolate, never on a public-facing container
+      # you haven't hardened.
+      - /var/run/docker.sock:/var/run/docker.sock
+      - codearena-submissions:/tmp/codearena-submissions
+
+volumes:
+  codearena-mysql-data:
+  codearena-submissions:
