@@ -48,7 +48,7 @@ It's split into two independently runnable pieces:
 React 19 · Vite · React Router · Redux Toolkit · MUI · Tailwind v4 · Monaco Editor · TanStack Query · Axios · Chart.js · Framer Motion
 
 **Backend**
-Spring Boot 3.3 (Java 21) · Spring Security + JWT · Spring Data JPA / Hibernate · Spring WebSocket (STOMP) · MySQL (prod) / H2 (dev) · jjwt · Lombok · MapStruct · springdoc-openapi (Swagger)
+Spring Boot 3.3 (Java 21) · Spring Security + JWT · Spring Data MongoDB (MongoDB Atlas) · Spring WebSocket (STOMP) · jjwt · Lombok · MapStruct · springdoc-openapi (Swagger)
 
 **Execution & infra**
 Docker (sandboxed per-language judge containers: Java, Python, C++, C, JavaScript) · Docker Compose · GitHub Actions (CI/CD, planned)
@@ -114,7 +114,7 @@ Each piece has its own `.env.example` with inline comments:
 
 ## Resume blurb
 
-> **CodeArena** — Full-stack online coding assessment platform (React 19, Spring Boot 3, MySQL, JWT, Docker, WebSockets). Built a secure, sandboxed code execution engine with automated evaluation against hidden test cases across five languages; implemented a real-time WebSocket leaderboard, contest management, and role-based dashboards for students, trainers and admins; documented the full API with OpenAPI/Swagger.
+> **CodeArena** — Full-stack online coding assessment platform (React 19, Spring Boot 3, MongoDB Atlas, JWT, Docker, WebSockets). Built a secure, sandboxed code execution engine with automated evaluation against hidden test cases across five languages; implemented a real-time WebSocket leaderboard, contest management, and role-based dashboards for students, trainers and admins; documented the full API with OpenAPI/Swagger.
 
 ## License
 

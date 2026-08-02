@@ -1,14 +1,7 @@
 spring:
-  datasource:
-    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:codearena}?useSSL=false&serverTimezone=UTC&createDatabaseIfNotExist=true
-    username: ${DB_USERNAME:codearena}
-    password: ${DB_PASSWORD:codearena}
-    driver-class-name: com.mysql.cj.jdbc.Driver
-  jpa:
-    database-platform: org.hibernate.dialect.MySQLDialect
-    hibernate:
-      ddl-auto: validate
-    show-sql: false
+  data:
+    mongodb:
+      uri: ${MONGODB_URI}
 
 logging:
   level:

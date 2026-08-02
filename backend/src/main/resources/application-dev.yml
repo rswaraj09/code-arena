@@ -1,19 +1,9 @@
 spring:
-  datasource:
-    url: jdbc:h2:mem:codearena;DB_CLOSE_DELAY=-1;MODE=MySQL
-    driver-class-name: org.h2.Driver
-    username: sa
-    password: ""
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-    hibernate:
-      ddl-auto: create-drop
-    show-sql: true
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27017/codearena_dev}
 
 logging:
   level:
     com.codearena: DEBUG
+    org.springframework.data.mongodb: DEBUG
