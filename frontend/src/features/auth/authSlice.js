@@ -44,6 +44,14 @@ export const register = createAsyncThunk('auth/register', async (payload, { reje
   }
 });
 
+export const verifyOtp = createAsyncThunk('auth/verifyOtp', async (payload, { rejectWithValue }) => {
+  try {
+    return await authService.verifyOtp(payload);
+  } catch (err) {
+    return rejectWithValue(err.response?.data?.message || 'Verification failed. Invalid or expired OTP.');
+  }
+});
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -86,6 +94,17 @@ const authSlice = createSlice({
         state.status = 'succeeded';
       })
       .addCase(register.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload;
+      })
+      .addCase(verifyOtp.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(verifyOtp.fulfilled, (state) => {
+        state.status = 'succeeded';
+      })
+      .addCase(verifyOtp.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload;
       });
