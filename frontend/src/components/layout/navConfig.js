@@ -23,6 +23,7 @@ export const NAV_BY_ROLE = {
   ],
   TRAINER: [
     { label: 'Dashboard', to: '/trainer', icon: DashboardRoundedIcon },
+    { label: 'Quizzes / Tests', to: '/trainer/quizzes', icon: QuizRoundedIcon },
     { label: 'Workshops', to: '/trainer/workshops', icon: SchoolRoundedIcon },
     { label: 'Contests', to: '/trainer/contests', icon: EmojiEventsRoundedIcon },
     { label: 'Assignments', to: '/trainer/assignments', icon: AssignmentRoundedIcon },

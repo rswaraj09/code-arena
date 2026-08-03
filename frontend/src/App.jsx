@@ -19,6 +19,10 @@ import ProblemsListPage from '@/features/problems/ProblemsListPage';
 import ProblemWorkspacePage from '@/features/problems/ProblemWorkspacePage';
 import ContestsListPage from '@/features/contests/ContestsListPage';
 import LeaderboardPage from '@/features/leaderboard/LeaderboardPage';
+
+import TrainerQuizzesPage from '@/features/quizzes/TrainerQuizzesPage';
+import StudentQuizzesPage from '@/features/quizzes/StudentQuizzesPage';
+import QuizAttemptPage from '@/features/quizzes/QuizAttemptPage';
 import ComingSoon from '@/components/common/ComingSoon';
 
 function App() {
@@ -42,7 +46,8 @@ function App() {
             <Route path="/problems/:slug" element={<ProblemWorkspacePage />} />
             <Route path="/contests" element={<ContestsListPage />} />
             <Route path="/assignments" element={<ComingSoon title="Assignments" description="Deadlines, submissions and feedback in one place." />} />
-            <Route path="/quizzes" element={<ComingSoon title="Quizzes" description="MCQs, timed sections and auto-grading." />} />
+            <Route path="/quizzes" element={<StudentQuizzesPage />} />
+            <Route path="/quizzes/:id/attempt" element={<QuizAttemptPage />} />
             <Route path="/leaderboard" element={<LeaderboardPage />} />
             <Route path="/certificates" element={<ComingSoon title="Certificates" description="Download your QR-verified certificates." />} />
           </Route>
@@ -52,6 +57,7 @@ function App() {
         <Route element={<ProtectedRoute allowedRoles={['TRAINER']} />}>
           <Route element={<DashboardLayout />}>
             <Route path="/trainer" element={<TrainerDashboard />} />
+            <Route path="/trainer/quizzes" element={<TrainerQuizzesPage />} />
             <Route path="/trainer/workshops" element={<ComingSoon title="Workshops" description="Create and manage workshops, attendance and certificates." />} />
             <Route path="/trainer/contests" element={<ComingSoon title="Contests" description="Build contests with coding problems, MCQs and negative marking." />} />
             <Route path="/trainer/assignments" element={<ComingSoon title="Assignments" description="Create assignments and track submissions." />} />
