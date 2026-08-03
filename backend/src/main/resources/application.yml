@@ -5,7 +5,7 @@ spring:
     active: ${SPRING_PROFILES_ACTIVE:dev}
   data:
     mongodb:
-      uri: ${MONGODB_URI:mongodb+srv://swarajritik_db_user:m9rbwAbkCCr1kNuh@cluster0.4ykba4o.mongodb.net/code-arena?retryWrites=true&w=majority}
+      uri: ${MONGODB_URI}
   servlet:
     multipart:
       max-file-size: 10MB
