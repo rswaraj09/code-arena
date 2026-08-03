@@ -1,7 +1,6 @@
 package com.codearena.problem;
 
 import com.codearena.common.BaseEntity;
-import com.codearena.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -47,8 +46,7 @@ public class Problem extends BaseEntity {
     @Builder.Default
     private boolean published = false;
 
-    @DocumentReference
-    private User createdBy;
+    private String createdById;
 
     @DocumentReference
     @Builder.Default

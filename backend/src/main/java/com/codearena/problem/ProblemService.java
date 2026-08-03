@@ -81,7 +81,7 @@ public class ProblemService {
                 .hints(request.hints() == null ? List.of() : request.hints())
                 .timeLimitMs(request.timeLimitMs() == null ? 1000 : request.timeLimitMs())
                 .memoryLimitMb(request.memoryLimitMb() == null ? 256 : request.memoryLimitMb())
-                .createdBy(creator)
+                .createdById(creator.getId())
                 .published(false) // requires explicit publish step, e.g. after admin review
                 .build();
 
