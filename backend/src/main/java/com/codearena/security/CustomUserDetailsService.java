@@ -1,7 +1,7 @@
 package com.codearena.security;
 
 import com.codearena.user.User;
-import com.codearena.user.UserRepository;
+import com.codearena.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -11,12 +11,15 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     @Override
     public UserPrincipal loadUserByUsername(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("No account found for " + email));
-        return new UserPrincipal(user);
+        try {
+            User user = userService.getByEmail(email);
+            return new UserPrincipal(user);
+        } catch (Exception e) {
+            throw new UsernameNotFoundException("No account found for " + email);
+        }
     }
 }

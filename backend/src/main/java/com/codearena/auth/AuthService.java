@@ -12,7 +12,6 @@ import com.codearena.user.StudentRepository;
 import com.codearena.user.Trainer;
 import com.codearena.user.TrainerRepository;
 import com.codearena.user.User;
-import com.codearena.user.UserRepository;
 import com.codearena.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -32,7 +31,6 @@ public class AuthService {
     private static final Duration OTP_VALIDITY = Duration.ofMinutes(10);
     private static final SecureRandom RANDOM = new SecureRandom();
 
-    private final UserRepository userRepository;
     private final StudentRepository studentRepository;
     private final TrainerRepository trainerRepository;
     private final RefreshTokenRepository refreshTokenRepository;
@@ -44,7 +42,7 @@ public class AuthService {
     private final UserService userService;
 
     public void register(RegisterRequest request) {
-        if (userRepository.existsByEmail(request.email())) {
+        if (userService.existsByEmail(request.email())) {
             throw new DuplicateResourceException("An account with this email already exists.");
         }
         if (request.role() == Role.ADMIN) {
@@ -52,18 +50,6 @@ public class AuthService {
         }
 
         String encodedPassword = passwordEncoder.encode(request.password());
-
-        User user = User.builder()
-                .name(request.name())
-                .email(request.email())
-                .passwordHash(encodedPassword)
-                .role(request.role())
-                .college(request.college())
-                .emailVerified(false)
-                .enabled(true)
-                .approved(true)
-                .build();
-        userRepository.save(user);
 
         if (request.role() == Role.STUDENT) {
             Student student = Student.builder()
@@ -91,7 +77,7 @@ public class AuthService {
             trainerRepository.save(trainer);
         }
 
-        issueOtp(user.getEmail(), "Email Verification Code");
+        issueOtp(request.email(), "Email Verification Code");
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -119,7 +105,7 @@ public class AuthService {
             throw new BadRequestException("Refresh token expired or revoked. Please sign in again.");
         }
 
-        User user = stored.getUser();
+        User user = userService.getById(stored.getUserId());
         stored.setRevoked(true); // rotate on every use
         refreshTokenRepository.save(stored);
 
@@ -137,28 +123,13 @@ public class AuthService {
         user.setEmailVerified(true);
         user.setOtpCode(null);
         user.setOtpExpiresAt(null);
-        userRepository.save(user);
-
-        if (user.getRole() == Role.STUDENT) {
-            studentRepository.findByEmail(request.email()).ifPresent(s -> {
-                s.setEmailVerified(true);
-                s.setOtpCode(null);
-                s.setOtpExpiresAt(null);
-                studentRepository.save(s);
-            });
-        } else if (user.getRole() == Role.TRAINER) {
-            trainerRepository.findByEmail(request.email()).ifPresent(t -> {
-                t.setEmailVerified(true);
-                t.setOtpCode(null);
-                t.setOtpExpiresAt(null);
-                trainerRepository.save(t);
-            });
-        }
+        userService.save(user);
     }
 
     public void forgotPassword(ForgotPasswordRequest request) {
-        userRepository.findByEmail(request.email())
-                .ifPresent(user -> issueOtp(user.getEmail(), "Password Reset Code"));
+        if (userService.existsByEmail(request.email())) {
+            issueOtp(request.email(), "Password Reset Code");
+        }
     }
 
     public void resetPassword(ResetPasswordRequest request) {
@@ -169,23 +140,7 @@ public class AuthService {
         user.setPasswordHash(encodedPassword);
         user.setOtpCode(null);
         user.setOtpExpiresAt(null);
-        userRepository.save(user);
-
-        if (user.getRole() == Role.STUDENT) {
-            studentRepository.findByEmail(request.email()).ifPresent(s -> {
-                s.setPasswordHash(encodedPassword);
-                s.setOtpCode(null);
-                s.setOtpExpiresAt(null);
-                studentRepository.save(s);
-            });
-        } else if (user.getRole() == Role.TRAINER) {
-            trainerRepository.findByEmail(request.email()).ifPresent(t -> {
-                t.setPasswordHash(encodedPassword);
-                t.setOtpCode(null);
-                t.setOtpExpiresAt(null);
-                trainerRepository.save(t);
-            });
-        }
+        userService.save(user);
 
         refreshTokenRepository.deleteByUserId(user.getId());
     }
@@ -198,7 +153,7 @@ public class AuthService {
 
         RefreshToken refreshToken = RefreshToken.builder()
                 .token(refreshTokenValue)
-                .user(user)
+                .userId(user.getId())
                 .expiresAt(Instant.now().plusMillis(jwtProperties.refreshTokenExpiryMs()))
                 .build();
         refreshTokenRepository.save(refreshToken);
@@ -213,21 +168,7 @@ public class AuthService {
         User user = userService.getByEmail(email);
         user.setOtpCode(code);
         user.setOtpExpiresAt(expiresAt);
-        userRepository.save(user);
-
-        if (user.getRole() == Role.STUDENT) {
-            studentRepository.findByEmail(email).ifPresent(s -> {
-                s.setOtpCode(code);
-                s.setOtpExpiresAt(expiresAt);
-                studentRepository.save(s);
-            });
-        } else if (user.getRole() == Role.TRAINER) {
-            trainerRepository.findByEmail(email).ifPresent(t -> {
-                t.setOtpCode(code);
-                t.setOtpExpiresAt(expiresAt);
-                trainerRepository.save(t);
-            });
-        }
+        userService.save(user);
 
         emailService.sendOtp(email, code, purposeTitle);
     }

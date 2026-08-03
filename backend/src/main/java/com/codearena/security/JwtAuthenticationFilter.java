@@ -1,7 +1,7 @@
 package com.codearena.security;
 
 import com.codearena.user.User;
-import com.codearena.user.UserRepository;
+import com.codearena.user.UserService;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -25,7 +25,7 @@ import java.util.Optional;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     @Override
     protected void doFilterInternal(
@@ -55,8 +55,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return; // refresh tokens may only be used at /auth/refresh, never as a bearer token
             }
             String userId = claims.getSubject();
-            User user = userRepository.findById(userId).orElse(null);
-            if (user == null || !user.isEnabled()) {
+            User user;
+            try {
+                user = userService.getById(userId);
+            } catch (Exception e) {
+                return;
+            }
+            if (!user.isEnabled()) {
                 return;
             }
             UserPrincipal principal = new UserPrincipal(user);
