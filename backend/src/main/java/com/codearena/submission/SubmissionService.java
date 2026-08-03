@@ -84,7 +84,7 @@ public class SubmissionService {
         }
 
         Submission submission = Submission.builder()
-                .user(user)
+                .userId(user.getId())
                 .problem(problem)
                 .contestId(contestId)
                 .language(language)

@@ -11,4 +11,7 @@ public interface SubmissionRepository extends MongoRepository<Submission, String
     long countByProblemIdAndVerdict(String problemId, Verdict verdict);
     long countByProblemId(String problemId);
     boolean existsByUserIdAndProblemIdAndVerdict(String userId, String problemId, Verdict verdict);
+    List<Submission> findByContestIdIn(List<String> contestIds);
+    List<Submission> findByUserId(String userId);
+    List<Submission> findTop10ByUserIdOrderByCreatedAtDesc(String userId);
 }

@@ -2,7 +2,6 @@ package com.codearena.submission;
 
 import com.codearena.common.BaseEntity;
 import com.codearena.problem.Problem;
-import com.codearena.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,8 +18,7 @@ import org.springframework.data.mongodb.core.mapping.DocumentReference;
 @Builder
 public class Submission extends BaseEntity {
 
-    @DocumentReference
-    private User user;
+    private String userId;
 
     @DocumentReference
     private Problem problem;
