@@ -1,7 +1,6 @@
 package com.codearena.contest;
 
 import com.codearena.common.BaseEntity;
-import com.codearena.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,6 +22,5 @@ public class ContestParticipant extends BaseEntity {
     @DocumentReference
     private Contest contest;
 
-    @DocumentReference
-    private User user;
+    private String userId;
 }

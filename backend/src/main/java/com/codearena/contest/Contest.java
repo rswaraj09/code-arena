@@ -2,7 +2,6 @@ package com.codearena.contest;
 
 import com.codearena.common.BaseEntity;
 import com.codearena.problem.Problem;
-import com.codearena.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -32,8 +31,7 @@ public class Contest extends BaseEntity {
     @Builder.Default
     private boolean negativeMarking = false;
 
-    @DocumentReference
-    private User createdBy;
+    private String createdById;
 
     @DocumentReference
     @Builder.Default

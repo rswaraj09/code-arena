@@ -37,7 +37,7 @@ public class ContestService {
                 .startTime(request.startTime())
                 .endTime(request.endTime())
                 .negativeMarking(request.negativeMarking())
-                .createdBy(creator)
+                .createdById(creator.getId())
                 .problems(problems)
                 .build();
 
@@ -77,7 +77,7 @@ public class ContestService {
         if (participantRepository.existsByContestIdAndUserId(contestId, user.getId())) {
             return; // idempotent — already registered
         }
-        participantRepository.save(ContestParticipant.builder().contest(contest).user(user).build());
+        participantRepository.save(ContestParticipant.builder().contest(contest).userId(user.getId()).build());
     }
 
     public Contest getById(String id) {
