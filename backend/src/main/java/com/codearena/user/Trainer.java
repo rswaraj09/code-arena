@@ -1,12 +1,10 @@
 package com.codearena.user;
 
-import com.codearena.common.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "trainers")
@@ -14,37 +12,22 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class Trainer extends BaseEntity {
-
-    private String name;
-
-    @Indexed(unique = true)
-    private String email;
-
-    private String passwordHash;
-
-    @Builder.Default
-    private Role role = Role.TRAINER;
-
-    @Builder.Default
-    private boolean emailVerified = false;
-
-    @Builder.Default
-    private boolean enabled = true;
-
-    // Trainer accounts require admin approval before they can create contests/workshops.
-    @Builder.Default
-    private boolean approved = false;
-
-    private String college;
-
-    private String avatarUrl;
+public class Trainer extends User {
 
     private String organization;
     private String bio;
     private String specialization;
 
-    private String otpCode;
-    private java.time.Instant otpExpiresAt;
+    @Builder
+    public Trainer(String name, String email, String passwordHash, Role role,
+                   boolean emailVerified, boolean enabled, boolean approved,
+                   String college, String avatarUrl, String otpCode,
+                   java.time.Instant otpExpiresAt, String organization,
+                   String bio, String specialization) {
+        super(name, email, passwordHash, role != null ? role : Role.TRAINER,
+              emailVerified, enabled, approved, college, avatarUrl, otpCode, otpExpiresAt);
+        this.organization = organization;
+        this.bio = bio;
+        this.specialization = specialization;
+    }
 }

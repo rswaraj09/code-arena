@@ -2,20 +2,16 @@ package com.codearena.user;
 
 import com.codearena.common.BaseEntity;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "users")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class User extends BaseEntity {
+public abstract class User extends BaseEntity {
 
     private String name;
 
@@ -26,15 +22,12 @@ public class User extends BaseEntity {
 
     private Role role;
 
-    @Builder.Default
-    private boolean emailVerified = false;
+    private boolean emailVerified;
 
-    @Builder.Default
-    private boolean enabled = true;
+    private boolean enabled;
 
     // Trainer accounts require admin approval before they can create contests/workshops.
-    @Builder.Default
-    private boolean approved = true;
+    private boolean approved;
 
     private String college;
 
