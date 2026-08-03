@@ -35,7 +35,8 @@ api.interceptors.response.use(
     const originalRequest = error.config;
 
     // Access token expired — try the refresh-token flow once per request.
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    const isAuthEndpoint = originalRequest.url?.includes('/auth/');
+    if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           pendingQueue.push({ resolve, reject });
@@ -54,9 +55,10 @@ api.interceptors.response.use(
           `${import.meta.env.VITE_API_BASE_URL || '/api'}/auth/refresh`,
           { refreshToken }
         );
-        localStorage.setItem('ca_access_token', data.accessToken);
-        flushQueue(null, data.accessToken);
-        originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
+        const newAccessToken = data.data.accessToken;
+        localStorage.setItem('ca_access_token', newAccessToken);
+        flushQueue(null, newAccessToken);
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         return api(originalRequest);
       } catch (refreshError) {
         flushQueue(refreshError, null);

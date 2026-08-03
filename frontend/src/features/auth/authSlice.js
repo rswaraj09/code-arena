@@ -27,10 +27,11 @@ const initialState = {
 
 export const login = createAsyncThunk('auth/login', async (credentials, { rejectWithValue }) => {
   try {
-    const data = await authService.login(credentials);
-    localStorage.setItem('ca_access_token', data.accessToken);
-    localStorage.setItem('ca_refresh_token', data.refreshToken);
-    return jwtDecode(data.accessToken);
+    const response = await authService.login(credentials);
+    const { accessToken, refreshToken } = response.data;
+    localStorage.setItem('ca_access_token', accessToken);
+    localStorage.setItem('ca_refresh_token', refreshToken);
+    return jwtDecode(accessToken);
   } catch (err) {
     return rejectWithValue(err.response?.data?.message || 'Unable to sign in. Check your credentials.');
   }
