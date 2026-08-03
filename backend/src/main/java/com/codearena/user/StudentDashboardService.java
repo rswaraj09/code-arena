@@ -45,10 +45,17 @@ public class StudentDashboardService {
         List<Submission> userSubmissions = submissionRepository.findByUserId(userId);
         List<Submission> recentSubmissionsList = submissionRepository.findTop10ByUserIdOrderByCreatedAtDesc(userId);
 
-        // 2. Solved problems count
+        // 2. Solved problems count with safe reference resolution
         Set<String> solvedProblemIds = userSubmissions.stream()
-                .filter(s -> s.getVerdict() == Verdict.ACCEPTED && s.getProblem() != null)
-                .map(s -> s.getProblem().getId())
+                .filter(s -> s.getVerdict() == Verdict.ACCEPTED)
+                .map(s -> {
+                    try {
+                        return s.getProblem() != null ? s.getProblem().getId() : null;
+                    } catch (Exception e) {
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
         long solvedCount = solvedProblemIds.size();
         long totalProblemsCount = problemRepository.count();
@@ -161,15 +168,25 @@ public class StudentDashboardService {
                 })
                 .toList();
 
-        // 7. Recent Submissions List
+        // 7. Recent Submissions List with safe title lookup
         List<RecentSubmissionItem> recentItems = recentSubmissionsList.stream()
-                .map(s -> new RecentSubmissionItem(
-                        s.getId(),
-                        s.getProblem() != null ? s.getProblem().getTitle() : "Problem",
-                        s.getVerdict() != null ? s.getVerdict().name() : "PENDING",
-                        s.getLanguage() != null ? s.getLanguage().name() : "Code",
-                        s.getCreatedAt()
-                ))
+                .map(s -> {
+                    String problemTitle = "Problem";
+                    try {
+                        if (s.getProblem() != null && s.getProblem().getTitle() != null) {
+                            problemTitle = s.getProblem().getTitle();
+                        }
+                    } catch (Exception e) {
+                        // ignore broken reference
+                    }
+                    return new RecentSubmissionItem(
+                            s.getId(),
+                            problemTitle,
+                            s.getVerdict() != null ? s.getVerdict().name() : "PENDING",
+                            s.getLanguage() != null ? s.getLanguage().name() : "Code",
+                            s.getCreatedAt()
+                    );
+                })
                 .toList();
 
         // 8. Skill Progress by Tags
@@ -223,22 +240,36 @@ public class StudentDashboardService {
     public List<StudentListItemResponse> getAllStudents() {
         return studentRepository.findAll().stream()
                 .map(student -> {
-                    List<Submission> submissions = submissionRepository.findByUserId(student.getId());
-                    long solvedCount = submissions.stream()
-                            .filter(s -> s.getVerdict() == Verdict.ACCEPTED && s.getProblem() != null)
-                            .map(s -> s.getProblem().getId())
-                            .distinct()
-                            .count();
+                    long solvedCount = 0;
+                    long totalSubmissions = 0;
+                    try {
+                        List<Submission> submissions = submissionRepository.findByUserId(student.getId());
+                        totalSubmissions = submissions.size();
+                        solvedCount = submissions.stream()
+                                .filter(s -> s.getVerdict() == Verdict.ACCEPTED)
+                                .map(s -> {
+                                    try {
+                                        return s.getProblem() != null ? s.getProblem().getId() : null;
+                                    } catch (Exception e) {
+                                        return null;
+                                    }
+                                })
+                                .filter(Objects::nonNull)
+                                .distinct()
+                                .count();
+                    } catch (Exception e) {
+                        log.warn("Error computing metrics for student {}", student.getId(), e);
+                    }
                     return new StudentListItemResponse(
                             student.getId(),
-                            student.getName(),
+                            student.getName() != null ? student.getName() : "Student",
                             student.getEmail(),
                             student.getCollege(),
                             student.getYear(),
                             student.getBranch(),
                             student.isEmailVerified(),
                             solvedCount,
-                            submissions.size(),
+                            totalSubmissions,
                             student.getCreatedAt()
                     );
                 })

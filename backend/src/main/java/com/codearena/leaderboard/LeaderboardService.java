@@ -42,7 +42,17 @@ public class LeaderboardService {
 
         List<Standing> standings = byUserId.entrySet().stream()
                 .map(entry -> {
-                    long solved = entry.getValue().stream().map(s -> s.getProblem().getId()).distinct().count();
+                    long solved = entry.getValue().stream()
+                            .map(s -> {
+                                try {
+                                    return s.getProblem() != null ? s.getProblem().getId() : null;
+                                } catch (Exception e) {
+                                    return null;
+                                }
+                            })
+                            .filter(java.util.Objects::nonNull)
+                            .distinct()
+                            .count();
                     long totalRuntime = entry.getValue().stream().mapToLong(s -> s.getRuntimeMs() == null ? 0 : s.getRuntimeMs()).sum();
                     return new Standing(entry.getKey(), solved, solved * 100, totalRuntime);
                 })
