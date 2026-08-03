@@ -4,6 +4,7 @@ import com.codearena.common.ApiResponse;
 import com.codearena.contest.dto.ContestDetailResponse;
 import com.codearena.contest.dto.ContestSummaryResponse;
 import com.codearena.contest.dto.CreateContestRequest;
+import com.codearena.contest.dto.TrainerDashboardResponse;
 import com.codearena.security.UserPrincipal;
 import com.codearena.user.User;
 import com.codearena.user.UserService;
@@ -25,7 +26,17 @@ import java.util.List;
 public class ContestController {
 
     private final ContestService contestService;
+    private final TrainerDashboardService trainerDashboardService;
     private final UserService userService;
+
+    @GetMapping("/dashboard")
+    @PreAuthorize("hasAnyRole('TRAINER', 'ADMIN')")
+    @Operation(summary = "Aggregated dashboard stats for the current trainer")
+    public ResponseEntity<ApiResponse<TrainerDashboardResponse>> dashboard(
+            @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        return ResponseEntity.ok(ApiResponse.ok(trainerDashboardService.getDashboard(principal.getId())));
+    }
 
     @GetMapping
     @Operation(summary = "List all contests (upcoming, live, ended)")
