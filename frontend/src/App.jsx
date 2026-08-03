@@ -12,6 +12,7 @@ import NotFoundPage from '@/pages/NotFoundPage';
 
 import StudentDashboard from '@/features/dashboard/student/StudentDashboard';
 import TrainerDashboard from '@/features/dashboard/trainer/TrainerDashboard';
+import TrainerStudentsPage from '@/features/dashboard/trainer/TrainerStudentsPage';
 import AdminDashboard from '@/features/dashboard/admin/AdminDashboard';
 
 import ProblemsListPage from '@/features/problems/ProblemsListPage';
@@ -55,7 +56,7 @@ function App() {
             <Route path="/trainer/contests" element={<ComingSoon title="Contests" description="Build contests with coding problems, MCQs and negative marking." />} />
             <Route path="/trainer/assignments" element={<ComingSoon title="Assignments" description="Create assignments and track submissions." />} />
             <Route path="/trainer/questions" element={<ComingSoon title="Question bank" description="Upload problems, test cases and editorials." />} />
-            <Route path="/trainer/students" element={<ComingSoon title="Students" description="Monitor your cohorts' progress and submissions." />} />
+            <Route path="/trainer/students" element={<TrainerStudentsPage />} />
             <Route path="/trainer/analytics" element={<ComingSoon title="Analytics" description="Submission trends, difficulty analysis and pass rates." />} />
           </Route>
         </Route>

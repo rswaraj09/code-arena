@@ -10,6 +10,7 @@ import com.codearena.submission.Submission;
 import com.codearena.submission.SubmissionRepository;
 import com.codearena.submission.Verdict;
 import com.codearena.user.dto.StudentDashboardResponse;
+import com.codearena.user.dto.StudentListItemResponse;
 import com.codearena.user.dto.StudentDashboardResponse.DailyActivity;
 import com.codearena.user.dto.StudentDashboardResponse.RecentSubmissionItem;
 import com.codearena.user.dto.StudentDashboardResponse.SkillProgressItem;
@@ -217,5 +218,31 @@ public class StudentDashboardService {
                 recentItems,
                 skillProgress
         );
+    }
+
+    public List<StudentListItemResponse> getAllStudents() {
+        return studentRepository.findAll().stream()
+                .map(student -> {
+                    List<Submission> submissions = submissionRepository.findByUserId(student.getId());
+                    long solvedCount = submissions.stream()
+                            .filter(s -> s.getVerdict() == Verdict.ACCEPTED && s.getProblem() != null)
+                            .map(s -> s.getProblem().getId())
+                            .distinct()
+                            .count();
+                    return new StudentListItemResponse(
+                            student.getId(),
+                            student.getName(),
+                            student.getEmail(),
+                            student.getCollege(),
+                            student.getYear(),
+                            student.getBranch(),
+                            student.isEmailVerified(),
+                            solvedCount,
+                            submissions.size(),
+                            student.getCreatedAt()
+                    );
+                })
+                .sorted(Comparator.comparing(StudentListItemResponse::solvedCount).reversed())
+                .toList();
     }
 }
